@@ -1,0 +1,78 @@
+body {
+    background-color: #f0f8ff; /* 배경색 */
+    font-family: Arial, sans-serif; /* 폰트 패밀리 */
+    color: #333; /* 텍스트 색상 */
+    margin: 0; /* 기본 여백 제거 */
+    padding: 0; /* 기본 패딩 제거 */
+}
+
+h1 {
+    text-align: center; /* 텍스트 정렬 */
+    font-size: 24px; /* 폰트 크기 */
+    margin: 20px 0; /* 상하 여백 */
+}
+
+a {
+    color: #007bff; /* 링크 색상 */
+    text-decoration: none;
+    margin: 0 10px; /* 좌우 여백 */
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.centertext {
+    text-align: center; /* 중앙 정렬 */
+}
+
+form {
+    width: 300px; /* 너비 */
+    margin: 20px auto; /* 중앙 정렬 */
+    padding: 20px; /* 내부 여백 */
+    border: 1px solid #ccc; /* 테두리 */
+    border-radius: 5px;
+    background-color: #fff; /* 배경색 */
+    position: relative;
+}
+
+input, select {
+    width: 160px; /* 입력 필드 너비 */
+    padding: 5px; /* 내부 여백 */
+    border: 1px solid #ccc; /* 테두리 */
+    border-radius: 3px;
+    position: absolute;
+    left: 100px;
+}
+
+input[type="radio"] {
+    width: auto; /* 라디오 버튼 기본 크기 유지 */
+    position: static;
+}
+
+.vertical-align {
+    position: absolute;
+    left: 100px;
+}
+
+.vertical-align2 {
+    position: absolute;
+    left: 200px;
+}
+
+input[type="submit"] {
+    width: 30%; /* 너비 */
+    height: 40px; /* 높이 */
+    font-size: 15px; /* 폰트 크기 */
+    background-color: rgb(100, 255, 100); /* 배경색 */
+    position: static;
+}
+
+input[type="reset"] {
+    width: 30%; /* 너비 */
+    height: 40px; /* 높이 */
+    font-size: 15px; /* 폰트 크기 */
+    color :#fff; /* 텍스트 색상 */
+    background-color: #f00; /* 배경색 */
+    position: static;
+}
