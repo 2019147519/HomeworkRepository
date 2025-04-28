@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <title>LAB1</title>
+        <link rel="stylesheet" type="text/css" href="main.css">
+    </head>
+    <body>
+        <h1>Welcome to INTERNET-PROGRAMMING MOVIE SITE</h1>
+        <nav class="nav-flex">
+            <div><a href="index.html">메인페이지</a></div>
+            <div><a href="login.html">로그인</a></div>
+            <div><a href="signup.html">회원가입</a></div>
+        </nav>
+        <div>
+            <form method="get" action="http://www.example.com">
+                <p>
+                    <label>이름: <input name="name" type="text" size="25" maxlength="30" 
+                        autocomplete="on" autofocus required placeholder="홍길동"></label>
+                </p>
+                <p>
+                    <label>생일: <input name="birth" type="date" required></label>
+                </p>
+                <p>성별:
+                    <label class="vertical-align"><input name="sex" type="radio" value="male" required>남성</label>
+                    <label class="vertical-align2"><input name="sex" type="radio" value="female">여성</label>
+                </p>
+                <p>
+                    <label>학년: <input name="grade" type="number" min="1" max="4" step="1" required></label>
+                </p>
+                <p>
+                    <label>아이디: <input name="id" type="text" size="25" maxlength="30" required></label>
+                </p>
+                <p>
+                    <label>비밀번호: <input name="password" type="password" size="25" maxlength="30" required></label>
+                </p>
+                <p>
+                    <label>보안 질문: 
+                        <select name = "security-question">
+                            <option selected>질문을 선택하세요</option>
+                            <option>당신의 별명은?</option>
+                            <option>당신이 좋아하는 색은?</option>
+                            <option>당신이 가장 친한 친구의 이름은?</option>
+                            <option>당신이 가장 좋아하는 것은?</option>
+                        </select>
+                    </label>
+                </p>
+                <p>
+                    <label>답변: <input name="answer" type="text" size="25" maxlength="30" required></label>
+                </p>
+                <p>
+                    <input type="submit" value="Signup">
+                    <input type="reset" value="Cancle">
+                </p>
+            </form>
+        </div>
+    </body>
+</html>
