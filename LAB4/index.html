@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인프밍 영화 정보 사이트</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div id="moving">
+        <h1>인프밍 영화 정보 사이트</h1>
+    </div>
+    
+    <div class="nav-flex">
+        <a href="index.html">메인페이지</a>
+        <a href="login.html">로그인</a>
+        <a href="signup.html">회원가입</a>
+    </div>
+    
+    <hr>
+    
+    <!-- 검색 및 정렬 컨트롤 -->
+    <div class="controls">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="영화 제목을 검색하세요...">
+            <button id="searchBtn">검색</button>
+        </div>
+        
+        <div class="sort-container">
+            <label for="sortSelect">정렬:</label>
+            <select id="sortSelect">
+                <option value="title-asc">제목 (오름차순)</option>
+                <option value="title-desc">제목 (내림차순)</option>
+                <option value="date-asc">개봉일 (오름차순)</option>
+                <option value="date-desc">개봉일 (내림차순)</option>
+                <option value="rating-asc">평점 (오름차순)</option>
+                <option value="rating-desc">평점 (내림차순)</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- 영화 목록 컨테이너 -->
+    <div id="movies-container">
+        <!-- 영화 카드들이 여기에 동적으로 추가됩니다 -->
+    </div>
+    
+    <!-- 로딩 인디케이터 -->
+    <div id="loading" class="loading">
+        <p>영화를 불러오는 중...</p>
+    </div>
+
+    <script>
+        let allMovies = [];
+        let filteredMovies = [];
+        let displayedMovies = [];
+        let currentIndex = 0;
+        const initialMoviesCount = 9; // 최초 로드 시 9개
+        const moviesPerPage = 3; // 스크롤 시 3개씩 추가
+        let isLoading = false;
+        let currentSearchTerm = '';
+        let currentSortOption = 'title-asc';
+        let isInitialLoad = true; // 최초 로드 여부 확인
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchMovies();
+            setupEventListeners();
+            setupInfiniteScroll();
+        });
+
+        // 영화 데이터 fetch
+        async function fetchMovies() {
+            try {
+                const response = await fetch('product.json');
+                const data = await response.json();
+                allMovies = data;
+                filteredMovies = [...allMovies];
+                sortMovies();
+                loadMoreMovies();
+            } catch (error) {
+                console.error('영화 데이터를 불러오는데 실패했습니다:', error);
+            }
+        }
+
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const sortSelect = document.getElementById('sortSelect');
+
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            sortSelect.addEventListener('change', function(e) {
+                currentSortOption = e.target.value;
+                resetAndReload();
+            });
+        }
+
+        // 검색 수행
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            currentSearchTerm = searchTerm;
+            
+            if (searchTerm === '') {
+                filteredMovies = [...allMovies];
+            } else {
+                filteredMovies = allMovies.filter(movie => 
+                    movie.title.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            resetAndReload();
+        }
+
+        // 영화 정렬
+        function sortMovies() {
+            const [sortBy, order] = currentSortOption.split('-');
+            
+            filteredMovies.sort((a, b) => {
+                let valueA, valueB;
+                
+                switch(sortBy) {
+                    case 'title':
+                        valueA = a.title.toLowerCase();
+                        valueB = b.title.toLowerCase();
+                        break;
+                    case 'date':
+                        valueA = new Date(a.release_date);
+                        valueB = new Date(b.release_date);
+                        break;
+                    case 'rating':
+                        valueA = a.vote_average;
+                        valueB = b.vote_average;
+                        break;
+                }
+                
+                if (order === 'asc') {
+                    return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+                } else {
+                    return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
+                }
+            });
+        }
+
+        // 리셋 후 재로드
+        function resetAndReload() {
+            currentIndex = 0;
+            displayedMovies = [];
+            isInitialLoad = true; // 리셋 시 다시 최초 로드로 설정
+            document.getElementById('movies-container').innerHTML = '';
+            sortMovies();
+            loadMoreMovies();
+        }
+
+        // 더 많은 영화 로드
+        function loadMoreMovies() {
+            if (isLoading || currentIndex >= filteredMovies.length) return;
+            
+            isLoading = true;
+            document.getElementById('loading').style.display = 'block';
+            
+            setTimeout(() => {
+                // 최초 로드인지 추가 로드인지에 따라 로드할 개수 결정
+                const loadCount = isInitialLoad ? initialMoviesCount : moviesPerPage;
+                const endIndex = Math.min(currentIndex + loadCount, filteredMovies.length);
+                const moviesToAdd = filteredMovies.slice(currentIndex, endIndex);
+                
+                moviesToAdd.forEach(movie => {
+                    displayedMovies.push(movie);
+                    renderMovie(movie);
+                });
+                
+                currentIndex = endIndex;
+                isInitialLoad = false; // 최초 로드 완료
+                isLoading = false;
+                document.getElementById('loading').style.display = 'none';
+            }, 500);
+        }
+
+        // 영화 카드 렌더링
+        function renderMovie(movie) {
+            const moviesContainer = document.getElementById('movies-container');
+            const movieCard = document.createElement('div');
+            movieCard.className = 'movie';
+            
+            movieCard.innerHTML = `
+                <div class="movie-poster" data-overview="${movie.overview}">
+                    <img src="${movie.poster_path}" alt="${movie.title}">
+                    <div class="overlay">
+                        <p>${movie.overview}</p>
+                    </div>
+                </div>
+                <div class="movie-info">
+                    <h3 class="movie-title">${movie.title}</h3>
+                    <p class="movie-date">개봉일: ${formatDate(movie.release_date)}</p>
+                    <p class="movie-rating">평점: ${movie.vote_average}/10</p>
+                </div>
+            `;
+            
+            moviesContainer.appendChild(movieCard);
+            
+            // JavaScript로 hover 이벤트 추가
+            setupHoverEvents(movieCard);
+        }
+
+        // 호버 이벤트 설정 함수
+        function setupHoverEvents(movieCard) {
+            const poster = movieCard.querySelector('.movie-poster');
+            const overlay = movieCard.querySelector('.overlay');
+            
+            // 마우스 진입 시
+            poster.addEventListener('mouseenter', function() {
+                showOverlay(overlay);
+            });
+            
+            // 마우스 떠날 시
+            poster.addEventListener('mouseleave', function() {
+                hideOverlay(overlay);
+            });
+        }
+
+        // 오버레이 표시 함수
+        function showOverlay(overlay) {
+            overlay.style.opacity = '1';
+            overlay.style.visibility = 'visible';
+        }
+
+        // 오버레이 숨김 함수
+        function hideOverlay(overlay) {
+            overlay.style.opacity = '0';
+            overlay.style.visibility = 'hidden';
+        }
+
+        // 날짜 포맷팅
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ko-KR');
+        }
+
+        // 무한 스크롤 설정
+        function setupInfiniteScroll() {
+            window.addEventListener('scroll', function() {
+                if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                    if (!isLoading && currentIndex < filteredMovies.length) {
+                        loadMoreMovies();
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
